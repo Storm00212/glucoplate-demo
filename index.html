@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GlucoPlate – Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0e2f2c;--leaf:#1f7a5c;--mint:#e3f2ec;--bg:#f4f7f6;--card:#fff;--amber:#d98e04;--coral:#d4473f;--mut:#5d7471;--line:#dbe6e2}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#cfe0da;color:var(--ink);min-height:100vh;display:flex;gap:32px;align-items:center;justify-content:center;padding:20px}
+h1,h2,h3,.brand{font-family:'Bricolage Grotesque',system-ui,sans-serif}
+.side{max-width:300px;font-size:14px;line-height:1.5}
+.side h1{font-size:30px;line-height:1.1;margin-bottom:8px}
+.side p{color:#35514d;margin-bottom:14px}
+.jump{display:flex;flex-wrap:wrap;gap:6px}
+.jump button{border:1px solid var(--ink);background:none;border-radius:99px;padding:6px 12px;cursor:pointer;color:var(--ink);font:inherit;font-size:13px}
+.jump button:hover,.jump button:focus-visible{background:var(--ink);color:#fff}
+.stack{margin-top:18px;font-size:12px;color:#35514d}
+.phone{width:390px;height:800px;max-height:94vh;background:var(--bg);border-radius:38px;border:10px solid #0b2321;box-shadow:0 24px 60px #0b232155;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.status{display:flex;justify-content:space-between;padding:10px 22px 4px;font-size:12px;font-weight:600}
+main{flex:1;overflow-y:auto;padding:8px 18px 18px}
+nav{display:flex;border-top:1px solid var(--line);background:#fff}
+nav button{flex:1;border:0;background:none;padding:9px 0 11px;font-size:11px;color:var(--mut);cursor:pointer}
+nav button b{display:block;font-size:17px;font-weight:400}
+nav button.on{color:var(--leaf);font-weight:700}
+h2{font-size:24px;margin:6px 0 2px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+.card{background:var(--card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--line)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.hero{background:var(--ink);color:#fff;border:0}
+.hero .sub{color:#a9cfc5;margin:0}
+.big{font-family:'Bricolage Grotesque';font-size:34px;font-weight:700}
+.bar{height:8px;background:#e6efec;border-radius:9px;overflow:hidden;margin:6px 0 2px}
+.bar i{display:block;height:100%;background:var(--leaf);border-radius:9px;transition:width .4s}
+.bar.warn i{background:var(--coral)}
+.hero .bar{background:#ffffff26}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.lo{background:#d6f0e3;color:#11633f}.me{background:#fbebc8;color:#7a5200}.hi{background:#f9d9d6;color:#8f2620}
+.btn{border:0;background:var(--leaf);color:#fff;padding:12px 16px;border-radius:12px;font:inherit;font-weight:600;cursor:pointer;width:100%}
+.btn.sec{background:var(--mint);color:var(--leaf)}.btn.sm{width:auto;padding:6px 11px;font-size:12px;border-radius:9px}
+input,select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;width:100%;background:#fff}
+label{font-size:12px;color:var(--mut);display:block;margin:8px 0 3px}
+.slot{font-size:12px;color:var(--leaf);font-weight:700;text-transform:capitalize}
+.meta{font-size:12px;color:var(--mut)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.disc{font-size:11px;color:var(--mut);text-align:center;margin-top:10px}
+.chat{max-height:210px;overflow:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.msg{padding:8px 11px;border-radius:12px;font-size:13px;max-width:85%}
+.me2{background:var(--leaf);color:#fff;align-self:flex-end}.ai{background:var(--mint)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px;font:inherit;font-size:13px;cursor:pointer}.tabs .on{background:var(--ink);color:#fff}
+.demo{font-size:10px;background:#fbebc8;color:#7a5200;padding:2px 7px;border-radius:99px;font-weight:700}
+@media(max-width:860px){.side{display:none}body{padding:0;background:var(--bg)}.phone{width:100%;height:100vh;max-height:none;border:0;border-radius:0}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<aside class="side">
+<h1>GlucoPlate</h1>
+<p>Budget-aware, sugar-safe meal planning for people with diabetes. Interactive demo with sample data. Try the planner sliders.</p>
+<div class="jump" id="jump"></div>
+<div class="stack">Real stack: Expo + Expo Router mobile app · Next.js API · PostgreSQL + Drizzle ORM. This demo runs entirely in the browser.</div>
+</aside>
+<div class="phone"><div class="status"><span>9:41</span><span class="demo">DEMO DATA</span><span>●●● 5G</span></div><main id="v"></main><nav id="nav"></nav></div>
+<script>
+const $=s=>document.querySelector(s);
+const SL=['breakfast','lunch','dinner','snack'];
+let id=0;const d=(name,slot,cost,pantry,kcal,carbs,protein,gi)=>({id:++id,name,slot,cost,pantry,kcal,carbs,protein,gi});
+const S={tab:'home',auth:false,budget:600,carb:150,reg:'login',skip:{},sub:'plans',open:null,
+dishes:[d('Millet porridge, no sugar','breakfast',40,false,210,34,6,52),d('Oats with milk & cinnamon','breakfast',70,false,260,38,10,55),d('Boiled eggs & kachumbari','breakfast',60,false,190,6,13,30),d('Sweet potato & tea (no sugar)','breakfast',50,false,240,45,3,63),d('Githeri with greens','lunch',90,false,380,52,16,42),d('Brown ugali, sukuma & beef','lunch',160,false,520,58,28,58),d('Grilled tilapia, kachumbari','lunch',280,false,430,12,38,28),d('Lentil stew (ndengu) & chapati','lunch',110,false,470,62,20,48),d('Brown rice, beans & cabbage','dinner',100,true,430,60,15,50),d('Chicken & vegetable stir-fry','dinner',260,false,390,14,34,30),d('Omena, ugali (sorghum) & spinach','dinner',120,false,460,54,26,54),d('Pumpkin leaves (isoto) & arrowroot','dinner',80,true,350,48,9,52),d('Roasted groundnuts (handful)','snack',40,true,160,5,7,14),d('Guava','snack',30,false,68,14,3,24),d('Plain yoghurt','snack',60,false,100,8,8,35),d('Roasted maize','snack',50,false,160,32,4,60)],
+plans:[{date:'Today',budget:600,items:[]},{date:'Yesterday',budget:600,cost:540,carbs:138,items:[['breakfast','Millet porridge, no sugar','eaten'],['lunch','Githeri with greens','eaten'],['dinner','Chicken & vegetable stir-fry','eaten'],['snack','Guava','skipped']]},{date:'Mon',budget:600,cost:610,carbs:152,items:[['breakfast','Boiled eggs & kachumbari','eaten'],['lunch','Lentil stew (ndengu) & chapati','eaten'],['dinner','Omena, ugali (sorghum) & spinach','eaten'],['snack','Roasted groundnuts (handful)','eaten']]}].slice(1),
+w:[82.4,82.1,81.9,81.5,81.6,81.0,80.8],target:76,
+carbs7:[138,152,121,144,130,118,141],spend7:[540,610,480,575,520,450,560],
+chat:[['ai','Hi! I\'m the GlucoPlate assistant (simulated demo). Ask about GI, carbs or budget.']]};
+const band=g=>g<=55?['lo','Low GI']:g<70?['me','Medium GI']:['hi','High GI'];
+const cost=x=>x.pantry?0:x.cost;
+const kes=n=>'KES '+Math.round(n);
+function gen(){const used=new Set(),items=[];
+SL.forEach(s=>{const c=S.dishes.filter(x=>x.slot===s&&!used.has(x.id)).sort((a,b)=>a.gi-b.gi||a.carbs-b.carbs||cost(a)-cost(b));
+if(!c.length)return;const p=c[(S.skip[s]||0)%c.length];used.add(p.id);items.push(p)});
+const t={cost:items.reduce((a,x)=>a+cost(x),0),carbs:items.reduce((a,x)=>a+x.carbs,0),kcal:items.reduce((a,x)=>a+x.kcal,0)};
+t.okB=t.cost<=S.budget;t.okC=t.carbs<=S.carb;
+t.msg=t.okB&&t.okC?'Plan is within your budget and carb target.':!t.okB&&!t.okC?'Over budget and over carb target. Try raising limits or adding cheaper dishes.':!t.okB?'Within carbs, but over today\'s budget.':'Within budget, but over your carb target.';
+return{items,t}}
+const bar=(v,m,w)=>`<div class="bar ${v>m?'warn':''}"><i style="width:${Math.min(100,v/m*100)}%"></i></div>`;
+const views={
+home(){const g=gen();return`<h2>Good morning, Paul</h2><p class="sub">Here's your day at a glance.</p>
+<div class="card hero"><div class="sub">Today's plan</div><div class="big">${kes(g.t.cost)} <span style="font-size:15px;font-weight:400">of ${kes(S.budget)}</span></div>${bar(g.t.cost,S.budget)}
+<div class="row" style="margin-top:8px"><span class="sub">${g.t.carbs} g of ${S.carb} g carbs</span><span class="sub">${g.t.kcal} kcal</span></div>${bar(g.t.carbs,S.carb)}</div>
+<div class="grid2"><div class="card"><div class="meta">Dishes in bucket</div><div class="big">${S.dishes.length}</div></div><div class="card"><div class="meta">Current weight</div><div class="big">${S.w.at(-1)}<span style="font-size:14px"> kg</span></div></div></div>
+<div class="card"><h3 style="font-size:16px;margin-bottom:8px">Today's meals</h3>${g.items.map(x=>`<div class="row" style="padding:7px 0;border-top:1px solid var(--line)"><div><div class="slot">${x.slot}</div>${x.name}</div><span class="pill ${band(x.gi)[0]}">GI ${x.gi}</span></div>`).join('')}</div>
+<button class="btn" onclick="go('planner')">Plan my day</button><p class="disc">Planning aid only, not medical advice. Coordinate targets with your healthcare provider.</p>`},
+planner(){const g=gen();S.cur=g;return`<h2>Smart meal planner</h2><p class="sub">Lowest GI first, then lowest carbs, then lowest cost.</p>
+<div class="card"><div class="row"><b>Daily budget</b><span id="bv">${kes(S.budget)}</span></div><input type="range" min="150" max="1200" step="10" value="${S.budget}" oninput="S.budget=+this.value;plan()">
+<div class="row" style="margin-top:10px"><b>Carb target</b><span id="cv">${S.carb} g</span></div><input type="range" min="40" max="260" step="5" value="${S.carb}" oninput="S.carb=+this.value;plan()"></div><div id="pl">${planBody(g)}</div>`},
+dishes(){return`<h2>Dish bucket</h2><p class="sub">Your personal collection of diabetic-friendly dishes.</p>
+<button class="btn sec" style="margin-bottom:12px" onclick="$('#add').hidden=!$('#add').hidden">+ Add a dish</button>
+<div class="card" id="add" hidden><label>Name</label><input id="dn" placeholder="e.g. Cabbage & beans"><div class="grid2"><div><label>Meal slot</label><select id="ds">${SL.map(s=>`<option>${s}</option>`).join('')}</select></div><div><label>Cost (KES)</label><input id="dc" type="number" value="80"></div><div><label>Carbs (g)</label><input id="dk" type="number" value="30"></div><div><label>Glycemic index</label><input id="dg" type="number" value="45"></div></div><button class="btn" style="margin-top:10px" onclick="addDish()">Save dish</button></div>
+${SL.map(s=>`<div class="slot" style="margin:10px 0 6px">${s}</div>`+S.dishes.filter(x=>x.slot===s).map(x=>`<div class="card"><div class="row"><b>${x.name}</b><span class="pill ${band(x.gi)[0]}">${band(x.gi)[1]}</span></div><div class="meta">${x.pantry?'Pantry (free)':kes(x.cost)} · ${x.carbs} g carbs · ${x.kcal} kcal · ${x.protein} g protein · GI ${x.gi}</div><div style="margin-top:6px"><button class="btn sec sm" onclick="S.dishes=S.dishes.filter(d=>d.id!=${x.id});render()">Delete</button></div></div>`).join('')).join('')}`},
+health(){const w=S.w,mn=Math.min(...w,S.target)-1,mx=Math.max(...w)+1;const pts=w.map((v,i)=>`${20+i*(300/(w.length-1))},${110-(v-mn)/(mx-mn)*90}`).join(' ');
+return`<h2>Health hub</h2><p class="sub">Track weight and ask nutrition questions.</p>
+<div class="card"><div class="row"><b>Weight trend</b><span class="meta">Target ${S.target} kg</span></div><svg viewBox="0 0 340 130" width="100%" role="img" aria-label="Weight trend"><polyline points="${pts}" fill="none" stroke="#1f7a5c" stroke-width="3" stroke-linejoin="round"/>${w.map((v,i)=>`<circle cx="${20+i*(300/(w.length-1))}" cy="${110-(v-mn)/(mx-mn)*90}" r="4" fill="#1f7a5c"/>`).join('')}</svg>
+<div class="row"><input id="wi" type="number" step="0.1" placeholder="Log weight (kg)" style="width:60%"><button class="btn sm" onclick="addW()">Add entry</button></div><p class="meta" style="margin-top:6px">${(S.w.at(-1)-S.target).toFixed(1)} kg to target</p></div>
+<div class="card"><b>Nutrition assistant</b> <span class="demo">SIMULATED</span><div class="chat" id="ch">${S.chat.map(m=>`<div class="msg ${m[0]=='ai'?'ai':'me2'}">${m[1]}</div>`).join('')}</div>
+<div class="row"><input id="ci" placeholder="Ask about GI, carbs, budget…" onkeydown="if(event.key=='Enter')ask()"><button class="btn sm" onclick="ask()">Send</button></div></div>`},
+more(){const sb=['plans','analytics','settings'];return`<div class="tabs">${sb.map(x=>`<button class="${S.sub==x?'on':''}" onclick="S.sub='${x}';render()">${x[0].toUpperCase()+x.slice(1)}</button>`).join('')}</div>`+sub[S.sub]()}};
+const sub={plans(){return`<h2>Saved plans</h2><p class="sub">Tap a day to mark meals eaten or skipped.</p>`+S.plans.map((p,i)=>`<div class="card"><div class="row" onclick="S.open=S.open===${i}?null:${i};render()" style="cursor:pointer"><div><b>${p.date}</b><div class="meta">${kes(p.cost)} of ${kes(p.budget)} · ${p.carbs} g carbs</div></div><span class="pill ${p.cost<=p.budget?'lo':'hi'}">${p.cost<=p.budget?'On budget':'Over'}</span></div>${S.open===i?p.items.map((it,j)=>`<div class="row" style="padding:7px 0;border-top:1px solid var(--line)"><div><div class="slot">${it[0]}</div>${it[1]}</div><button class="btn sec sm" onclick="S.plans[${i}].items[${j}][2]=S.plans[${i}].items[${j}][2]=='eaten'?'skipped':'eaten';render()">${it[2]}</button></div>`).join(''):''}</div>`).join('')},
+analytics(){const dy=['M','T','W','T','F','S','S'],mc=Math.max(...S.carbs7,S.carb);const avg=Math.round(S.carbs7.reduce((a,b)=>a+b)/7),sp=S.spend7.reduce((a,b)=>a+b);
+return`<h2>Analytics</h2><p class="sub">Last 7 days</p><div class="grid2"><div class="card"><div class="meta">Avg carbs/day</div><div class="big">${avg} g</div></div><div class="card"><div class="meta">Total spend</div><div class="big" style="font-size:24px">${kes(sp)}</div></div></div>
+<div class="card"><b>Carb intake vs target</b><svg viewBox="0 0 340 150" width="100%" role="img" aria-label="Carb intake bars">${S.carbs7.map((v,i)=>{const h=v/mc*100;return`<rect x="${14+i*46}" y="${120-h}" width="28" height="${h}" rx="6" fill="${v>S.carb?'#d4473f':'#1f7a5c'}"/><text x="${28+i*46}" y="138" font-size="11" text-anchor="middle" fill="#5d7471">${dy[i]}</text>`}).join('')}<line x1="0" x2="340" y1="${120-S.carb/mc*100}" y2="${120-S.carb/mc*100}" stroke="#d98e04" stroke-dasharray="4 4"/></svg><p class="meta">Dashed line = your ${S.carb} g target. Red bars exceeded it.</p></div>
+<div class="card"><b>Meal quality</b><div class="meta" style="margin:6px 0">Share of meals by GI band</div><div class="bar"><i style="width:68%"></i></div><div class="meta">68% low GI · 25% medium · 7% high</div></div>`},
+settings(){return`<h2>Settings</h2><div class="card"><label>Name</label><input value="Paul Muyali"><label>Diabetes type</label><select><option>Type 2</option><option>Type 1</option></select><label>Allergies / dislikes</label><input placeholder="e.g. peanuts"><label>Daily budget (KES)</label><input type="number" value="${S.budget}" onchange="S.budget=+this.value"><label>Carb target (g)</label><input type="number" value="${S.carb}" onchange="S.carb=+this.value"></div><button class="btn" onclick="S.auth=false;render()">Sign out</button><p class="disc">GlucoPlate is a planning aid, not a substitute for professional medical advice.</p>`}};
+function planBody(g){return g.items.map(x=>`<div class="card"><div class="row"><div><div class="slot">${x.slot}</div><b>${x.name}</b></div><span class="pill ${band(x.gi)[0]}">GI ${x.gi}</span></div><div class="row"><span class="meta">${x.pantry?'Pantry (free)':kes(x.cost)} · ${x.carbs} g carbs · ${x.kcal} kcal</span><button class="btn sec sm" onclick="S.skip['${x.slot}']=(S.skip['${x.slot}']||0)+1;plan()">Swap</button></div></div>`).join('')+
+`<div class="card hero"><div class="row"><span>Cost</span><b>${kes(g.t.cost)} / ${kes(S.budget)}</b></div>${bar(g.t.cost,S.budget)}<div class="row"><span>Carbs</span><b>${g.t.carbs} g / ${S.carb} g</b></div>${bar(g.t.carbs,S.carb)}<p class="sub" style="margin-top:8px">${g.t.msg}</p></div><button class="btn" onclick="savePlan()">Save this plan</button><p class="disc">Planning aid only, not medical advice.</p>`}
+function plan(){const g=gen();S.cur=g;$('#pl').innerHTML=planBody(g);$('#bv').textContent=kes(S.budget);$('#cv').textContent=S.carb+' g'}
+function savePlan(){const g=S.cur;S.plans.unshift({date:'Today',budget:S.budget,cost:g.t.cost,carbs:g.t.carbs,items:g.items.map(x=>[x.slot,x.name,'planned'])});S.sub='plans';S.open=0;go('more')}
+function addDish(){const n=$('#dn').value.trim();if(!n)return;S.dishes.push(d(n,$('#ds').value,+$('#dc').value,false,+$('#dk').value*8,+$('#dk').value/3|0,5,+$('#dg').value));render()}
+function addW(){const v=parseFloat($('#wi').value);if(v)S.w.push(v);render()}
+function ask(){const q=$('#ci').value.trim();if(!q)return;const l=q.toLowerCase();let a='I can help with GI, carbs and budget. Remember to confirm targets with your care team.';
+if(/gi|glyc/.test(l))a='Glycemic index ranks how fast a food raises blood sugar. Under 55 is low. GlucoPlate picks the lowest-GI dish for each meal first.';
+else if(/carb/.test(l))a='Your carb target is set in Settings. The planner flags any plan that goes over it.';
+else if(/budget|cheap|cost|money/.test(l))a='Pantry items count as zero cost, so using what you already have stretches your budget further.';
+S.chat.push(['me',q],['ai',a]);render();$('#ch').scrollTop=9999}
+function go(t){S.tab=t;render()}
+const T=[['home','🏠','Overview'],['planner','🥗','Planner'],['dishes','🍲','Dishes'],['health','❤️','Health'],['more','☰','More']];
+function login(){return`<div style="padding-top:50px"><div class="brand" style="font-size:40px;font-weight:700">GlucoPlate</div><p class="sub" style="font-size:15px">Precision nutrition for a stable life.</p>
+<div class="card" style="margin-top:26px"><div class="tabs"><button class="${S.reg=='login'?'on':''}" onclick="S.reg='login';render()">Sign in</button><button class="${S.reg=='reg'?'on':''}" onclick="S.reg='reg';render()">Create account</button></div>${S.reg=='reg'?'<label>Name</label><input value="Paul Muyali">':''}<label>Email</label><input value="paul@example.com"><label>Password</label><input type="password" value="demo1234"><button class="btn" style="margin-top:14px" onclick="S.auth=true;go('home')">${S.reg=='reg'?'Create account':'Sign in'}</button></div><p class="disc">Demo mode: any details work.</p></div>`}
+function render(){const m=$('#v');if(!S.auth){m.innerHTML=login();$('#nav').innerHTML='';return}
+m.innerHTML=S.tab=='more'?views.more():views[S.tab]();$('#nav').innerHTML=T.map(t=>`<button class="${S.tab==t[0]?'on':''}" onclick="go('${t[0]}')"><b>${t[1]}</b>${t[2]}</button>`).join('')}
+$('#jump').innerHTML=[['Sign in',()=>{S.auth=false;render()}],['Overview',()=>{S.auth=true;go('home')}],['Planner',()=>{S.auth=true;go('planner')}],['Dishes',()=>{S.auth=true;go('dishes')}],['Health hub',()=>{S.auth=true;go('health')}],['Plans',()=>{S.auth=true;S.sub='plans';go('more')}],['Analytics',()=>{S.auth=true;S.sub='analytics';go('more')}],['Settings',()=>{S.auth=true;S.sub='settings';go('more')}]].map((j,i)=>`<button data-i="${i}">${j[0]}</button>`).join('');
+const J=[()=>{S.auth=false;render()},()=>{S.auth=true;go('home')},()=>{S.auth=true;go('planner')},()=>{S.auth=true;go('dishes')},()=>{S.auth=true;go('health')},()=>{S.auth=true;S.sub='plans';go('more')},()=>{S.auth=true;S.sub='analytics';go('more')},()=>{S.auth=true;S.sub='settings';go('more')}];
+$('#jump').onclick=e=>{const i=e.target.dataset.i;if(i!=null)J[i]()};
+render();
+</script></body></html>
